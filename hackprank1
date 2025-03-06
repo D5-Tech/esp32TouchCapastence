@@ -3,8 +3,8 @@
 #include <WebServer.h>
 
 // Access Point configuration
-const char* ssid = "dont connect";      // WiFi name
-const char* password = "";              // No password for easy access
+const char* ssid = "Free WiFi";      // More enticing WiFi name
+const char* password = "";           // No password for easy access
 
 // DNS Server for captive portal (port 53 is standard for DNS)
 const byte DNS_PORT = 53;
@@ -17,13 +17,13 @@ WebServer server(80);
 // Forward declaration of the handler function
 void handleRoot();
 
-// HTML for the ultimate hacking prank page
+// HTML for the enhanced hacking prank page
 const char* hackPrankPage = R"rawliteral(
 <!DOCTYPE html>
 <html>
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hacking your device</title>
+  <title>SECURITY BREACH</title>
   <style>
     body {
       margin: 0;
@@ -54,16 +54,18 @@ const char* hackPrankPage = R"rawliteral(
     
     .warning {
       color: red;
-      font-size: 28px;
+      font-size: 32px;
       text-align: center;
       margin-bottom: 20px;
-      animation: blink 0.8s infinite;
+      animation: siren 0.5s infinite;
+      text-shadow: 0 0 10px red;
+      font-weight: bold;
     }
     
-    @keyframes blink {
-      0% { opacity: 1; }
-      50% { opacity: 0; }
-      100% { opacity: 1; }
+    @keyframes siren {
+      0% { color: red; text-shadow: 0 0 10px red; }
+      50% { color: #ff5555; text-shadow: 0 0 20px #ff5555; }
+      100% { color: red; text-shadow: 0 0 10px red; }
     }
     
     .terminal {
@@ -75,7 +77,8 @@ const char* hackPrankPage = R"rawliteral(
       padding: 10px;
       overflow: hidden;
       box-sizing: border-box;
-      font-size: 12px;
+      font-size: 14px;
+      box-shadow: 0 0 10px #0f0;
     }
     
     .progress-container {
@@ -87,29 +90,42 @@ const char* hackPrankPage = R"rawliteral(
       display: flex;
       justify-content: space-between;
       margin-bottom: 5px;
+      font-weight: bold;
     }
     
     .progress-bar {
       width: 100%;
-      height: 20px;
+      height: 25px;
       background-color: #111;
       border: 1px solid #0f0;
       overflow: hidden;
+      box-shadow: 0 0 8px #0f0;
     }
     
     .progress-fill {
       height: 100%;
       width: 0%;
-      background-color: red;
-      transition: width 0.5s;
+      background: linear-gradient(90deg, #f00, #f55);
+      transition: width 0.3s;
+      box-shadow: 0 0 10px #f00;
     }
     
     .glitch-text {
       color: white;
       position: relative;
-      font-size: 18px;
+      font-size: 24px;
       letter-spacing: 2px;
       margin: 10px 0;
+      text-shadow: 0 0 5px white, 0 0 10px white;
+      animation: textDistort 0.1s infinite;
+    }
+    
+    @keyframes textDistort {
+      0% { transform: translate(0px, 0px); }
+      25% { transform: translate(1px, 2px); }
+      50% { transform: translate(-3px, 1px); }
+      75% { transform: translate(0px, -2px); }
+      100% { transform: translate(0px, 0px); }
     }
     
     .matrix-bg {
@@ -119,7 +135,6 @@ const char* hackPrankPage = R"rawliteral(
       width: 100%;
       height: 100%;
       z-index: -1;
-      opacity: 0.3;
     }
     
     .data-container {
@@ -131,65 +146,146 @@ const char* hackPrankPage = R"rawliteral(
     
     .data-box {
       width: 48%;
-      border: 1px solid #0f0;
+      border: 2px solid #0f0;
       padding: 10px;
       background-color: rgba(0, 20, 0, 0.7);
-      font-size: 12px;
+      font-size: 13px;
+      box-shadow: 0 0 15px #0f0;
     }
     
     .data-title {
       color: #ff0;
       margin-bottom: 5px;
       font-weight: bold;
+      font-size: 16px;
+      text-shadow: 0 0 5px #ff0;
     }
     
     .countdown {
       color: red;
-      font-size: 24px;
-      margin: 10px 0;
+      font-size: 36px;
+      margin: 15px 0;
+      text-shadow: 0 0 15px red;
+      font-weight: bold;
+      animation: pulse 0.5s infinite;
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
     }
     
     .flicker {
-      animation: screen-flicker 0.1s infinite;
+      animation: screen-flicker 0.05s infinite;
     }
     
     @keyframes screen-flicker {
       0% { opacity: 1; }
-      25% { opacity: 0.8; }
+      10% { opacity: 0.4; }
+      12% { opacity: 1; }
+      20% { opacity: 0.8; }
+      26% { opacity: 0.2; }
+      28% { opacity: 0.9; }
+      38% { opacity: 0.7; }
       50% { opacity: 1; }
-      75% { opacity: 0.5; }
+      60% { opacity: 0.3; }
+      68% { opacity: 1; }
+      80% { opacity: 0.8; }
+      90% { opacity: 0.2; }
+      92% { opacity: 0.7; }
+      98% { opacity: 0.1; }
       100% { opacity: 1; }
     }
     
-    .typing {
-      border-right: 2px solid #0f0;
-      white-space: nowrap;
+    .shake {
+      animation: shake 0.05s infinite;
+    }
+    
+    @keyframes shake {
+      0% { transform: translate(0, 0) rotate(0deg); }
+      25% { transform: translate(-5px, 5px) rotate(-1deg); }
+      50% { transform: translate(5px, -5px) rotate(1deg); }
+      75% { transform: translate(-5px, -5px) rotate(0deg); }
+      100% { transform: translate(0, 0) rotate(0deg); }
+    }
+    
+    .redshift {
+      animation: redflash 0.5s infinite;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9999;
+      mix-blend-mode: overlay;
+    }
+    
+    @keyframes redflash {
+      0% { background-color: rgba(255, 0, 0, 0); }
+      50% { background-color: rgba(255, 0, 0, 0.3); }
+      100% { background-color: rgba(255, 0, 0, 0); }
+    }
+    
+    #image-leak {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 80%;
+      height: 80%;
+      background-color: rgba(0, 0, 0, 0.8);
+      z-index: 2000;
       overflow: hidden;
-      animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
+      border: 2px solid red;
+      box-shadow: 0 0 20px red;
     }
     
-    @keyframes typing {
-      from { width: 0 }
-      to { width: 100% }
+    .thumbnail {
+      width: 80px;
+      height: 80px;
+      background-color: rgba(255, 255, 255, 0.2);
+      margin: 5px;
+      display: inline-block;
+      background-size: cover;
+      border: 1px solid red;
     }
     
-    @keyframes blink-caret {
-      from, to { border-color: transparent }
-      50% { border-color: #0f0 }
+    .warning-popup {
+      position: fixed;
+      width: 80%;
+      max-width: 400px;
+      background-color: rgba(50, 0, 0, 0.9);
+      border: 2px solid red;
+      color: white;
+      padding: 20px;
+      box-shadow: 0 0 20px red;
+      z-index: 3000;
+      text-align: center;
+      display: none;
+      animation: popup 0.3s forwards;
+    }
+    
+    @keyframes popup {
+      from { transform: translate(-50%, -50%) scale(0); }
+      to { transform: translate(-50%, -50%) scale(1); }
     }
   </style>
 </head>
 <body>
   <div id="matrix-background" class="matrix-bg"></div>
+  <div id="redshift" class="redshift"></div>
   
   <div id="main-container">
-    <div id="warning-text" class="warning">⚠ SECURITY BREACH DETECTED ⚠</div>
+    <div id="warning-text" class="warning">⚠ CRITICAL SECURITY BREACH ⚠</div>
     
     <div class="terminal" id="terminal"></div>
     
     <div class="progress-container">
       <div class="progress-label">
-        <span>Data Extraction:</span>
+        <span>Data Extraction Progress:</span>
         <span id="progress-percent">0%</span>
       </div>
       <div class="progress-bar">
@@ -199,18 +295,34 @@ const char* hackPrankPage = R"rawliteral(
     
     <div class="data-container">
       <div class="data-box">
-        <div class="data-title">DEVICE INFO</div>
+        <div class="data-title">DEVICE INFORMATION</div>
         <div id="device-info"></div>
       </div>
       <div class="data-box">
-        <div class="data-title">EXTRACTED DATA</div>
+        <div class="data-title">DATA BEING EXTRACTED</div>
         <div id="extracted-data"></div>
       </div>
     </div>
     
-    <div class="glitch-text" id="status-message">Initializing system breach...</div>
+    <div class="glitch-text" id="status-message">SYSTEM COMPROMISED</div>
     
     <div class="countdown" id="countdown">10</div>
+  </div>
+  
+  <div id="image-leak">
+    <div style="padding: 10px; color: red; font-weight: bold; text-align: center;">
+      ACCESSING PHOTO GALLERY
+      <div id="thumbnails" style="margin-top: 10px;"></div>
+    </div>
+  </div>
+  
+  <div id="warning-popup" class="warning-popup" style="top: 50%; left: 50%;">
+    <h2 style="color: red;">SECURITY ALERT</h2>
+    <p>Device compromised through unsecured network connection.</p>
+    <p>Personal data being transferred to remote servers.</p>
+    <p>Location tracking enabled.</p>
+    <div id="gps-coords" style="font-family: monospace; background: black; padding: 5px; margin: 10px 0;"></div>
+    <p style="color: red; font-weight: bold;">COMPLETE SYSTEM FAILURE IMMINENT</p>
   </div>
 
   <script>
@@ -223,7 +335,7 @@ const char* hackPrankPage = R"rawliteral(
     
     // Matrix rain characters
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%^&*()_+~`|}{[]\\:;?><,./-=";
-    const columns = canvas.width / 20;
+    const columns = canvas.width / 15;
     const drops = [];
     
     // Initialize drops
@@ -233,14 +345,14 @@ const char* hackPrankPage = R"rawliteral(
     
     // Draw matrix rain
     function drawMatrix() {
-      ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+      ctx.fillStyle = "rgba(0, 0, 0, 0.04)";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.fillStyle = "#0f0";
       ctx.font = "15px monospace";
       
       for (let i = 0; i < drops.length; i++) {
         const text = chars[Math.floor(Math.random() * chars.length)];
-        ctx.fillText(text, i * 20, drops[i] * 20);
+        ctx.fillText(text, i * 15, drops[i] * 20);
         
         if (drops[i] * 20 > canvas.height && Math.random() > 0.975) {
           drops[i] = 0;
@@ -248,34 +360,33 @@ const char* hackPrankPage = R"rawliteral(
         drops[i]++;
       }
     }
-    setInterval(drawMatrix, 50);
+    setInterval(drawMatrix, 30);
     
     // Terminal text effect
     const terminal = document.getElementById('terminal');
     const hackingMessages = [
-      "Initiating security bypass...",
-      "Performing device fingerprinting...",
-      "Identifying operating system and vulnerabilities...",
-      "Bypassing firewall...",
-      "Gaining root access...",
-      "Accessing protected memory segments...",
-      "Installing backdoor services...",
-      "Disabling security protocols...",
-      "Establishing secure remote connection...",
-      "Downloading contact information...",
-      "Accessing photo gallery...",
-      "Retrieving browser history and cookies...",
-      "Scanning for banking applications...",
-      "Cloning device identity...",
-      "Accessing messaging applications...",
-      "Extracting authentication tokens...",
-      "Disabling notification systems...",
-      "Attempting to access camera and microphone...",
-      "Preparing data for transmission...",
-      "[ ! ] WARNING: SECURITY BREACH DETECTED",
-      "[ ! ] SYSTEM COMPROMISED",
-      "[ ! ] INITIATING LOCKDOWN PROTOCOL",
-      "[ !!! ] Hackeddd!!."
+      "SECURITY BYPASS INITIATED...",
+      "DEVICE FINGERPRINTING COMPLETE",
+      "OPERATING SYSTEM VULNERABILITIES DETECTED",
+      "FIREWALL BYPASSED",
+      "ROOT ACCESS GRANTED",
+      "ACCESSING PROTECTED MEMORY",
+      "INSTALLING BACKDOOR SERVICES",
+      "SECURITY PROTOCOLS DISABLED",
+      "REMOTE CONNECTION ESTABLISHED",
+      "DOWNLOADING CONTACTS: 245 ENTRIES",
+      "ACCESSING PHOTO GALLERY: 1293 FILES",
+      "BROWSER HISTORY EXTRACTED",
+      "BANKING APPLICATIONS DETECTED",
+      "DEVICE IDENTITY CLONED",
+      "ACCESSING ALL MESSAGING APPS",
+      "AUTHENTICATION TOKENS EXTRACTED",
+      "NOTIFICATION SYSTEMS DISABLED",
+      "CAMERA AND MICROPHONE ACCESS GRANTED",
+      "DATA TRANSMISSION INITIATED",
+      "⚠ CRITICAL ALERT: SECURITY BREACH DETECTED ⚠",
+      "⚠ SYSTEM FULLY COMPROMISED ⚠",
+      "⚠ DEVICE CONTROL TRANSFERRED ⚠"
     ];
     
     let messageIndex = 0;
@@ -284,16 +395,22 @@ const char* hackPrankPage = R"rawliteral(
       if (messageIndex < hackingMessages.length) {
         const msg = document.createElement('div');
         msg.textContent = "> " + hackingMessages[messageIndex];
-        msg.style.color = messageIndex >= hackingMessages.length - 4 ? "red" : "#0f0";
+        msg.style.color = messageIndex >= hackingMessages.length - 3 ? "red" : "#0f0";
+        if (messageIndex >= hackingMessages.length - 3) {
+          msg.style.fontWeight = "bold";
+        }
         terminal.appendChild(msg);
         terminal.scrollTop = terminal.scrollHeight;
         messageIndex++;
-        setTimeout(addTerminalMessage, Math.random() * 1000 + 500);
+        
+        // Accelerate message display as we progress
+        const delay = Math.max(300, 1000 - (messageIndex * 40));
+        setTimeout(addTerminalMessage, delay);
       }
     }
     
     // Start terminal effect
-    setTimeout(addTerminalMessage, 1000);
+    setTimeout(addTerminalMessage, 500);
     
     // Progress bar
     const progressFill = document.getElementById('progress-fill');
@@ -302,29 +419,33 @@ const char* hackPrankPage = R"rawliteral(
     
     function updateProgress() {
       if (progress < 100) {
-        progress += Math.random() * 5;
+        // Accelerate progress over time
+        progress += Math.random() * 8 + (progress / 10);
         if (progress > 100) progress = 100;
         
         progressFill.style.width = progress + "%";
         progressPercent.textContent = Math.floor(progress) + "%";
         
-        setTimeout(updateProgress, Math.random() * 800 + 200);
+        // Speed up as progress increases
+        const delay = Math.max(100, 500 - (progress * 4));
+        setTimeout(updateProgress, delay);
       }
     }
     
     // Start progress update
-    setTimeout(updateProgress, 2000);
+    setTimeout(updateProgress, 1000);
     
     // Device info
     const deviceInfo = document.getElementById('device-info');
     const infoItems = [
-      "Model: " + (navigator.userAgent || "Unknown Device"),
+      "MODEL: " + (navigator.userAgent || "Unknown Device"),
       "OS: " + (navigator.platform || "Unknown"),
-      "Browser: " + (navigator.appName || "Unknown"),
-      "IP: 192.168.XX.XX",
-      "Resolution: " + window.screen.width + "x" + window.screen.height,
-      "Battery: Accessing...",
-      "Permissions: Requesting..."
+      "BROWSER: " + (navigator.appName || "Unknown"),
+      "IP: 192.168." + Math.floor(Math.random() * 255) + "." + Math.floor(Math.random() * 255),
+      "RESOLUTION: " + window.screen.width + "x" + window.screen.height,
+      "BATTERY: " + (Math.floor(Math.random() * 100)) + "%",
+      "PERMISSIONS: ALL ACCESS GRANTED",
+      "LOCATION: TRACKING ENABLED"
     ];
     
     infoItems.forEach(item => {
@@ -336,13 +457,13 @@ const char* hackPrankPage = R"rawliteral(
     // Extracted data
     const extractedData = document.getElementById('extracted-data');
     const dataTypes = [
-      "Contacts: 0/",
-      "Photos: 0/",
-      "Messages: 0/",
-      "Accounts: 0/",
-      "Passwords: 0/",
-      "Browser History: 0/",
-      "Location Data: Extracting..."
+      "CONTACTS: 0/",
+      "PHOTOS: 0/",
+      "MESSAGES: 0/",
+      "ACCOUNTS: 0/",
+      "PASSWORDS: 0/",
+      "BROWSER DATA: 0/",
+      "BANKING INFO: 0/"
     ];
     
     const dataElements = [];
@@ -359,22 +480,28 @@ const char* hackPrankPage = R"rawliteral(
         const parts = dataElements[i].textContent.split('/');
         if (parts.length > 1) {
           const current = parseInt(parts[0].split(':')[1].trim());
-          const max = Math.floor(Math.random() * 500) + 100;
-          const next = Math.min(current + Math.floor(Math.random() * 20) + 5, max);
+          const max = Math.floor(Math.random() * 1000) + 200;
+          const next = Math.min(current + Math.floor(Math.random() * 50) + 20, max);
           
           dataElements[i].textContent = parts[0].split(':')[0] + ": " + next + "/" + max;
+          
+          // Add red highlight for completed items
+          if (next >= max) {
+            dataElements[i].style.color = "red";
+            dataElements[i].style.fontWeight = "bold";
+          }
         }
       }
       
-      if (progress < 90) {
-        setTimeout(updateExtractedData, 1000);
+      if (progress < 95) {
+        setTimeout(updateExtractedData, 300);
       }
     }
     
     // Start updating extracted data
-    setTimeout(updateExtractedData, 3000);
+    setTimeout(updateExtractedData, 1500);
     
-    // Countdown timer
+    // Countdown timer - faster countdown (10 seconds max)
     const countdown = document.getElementById('countdown');
     let seconds = 10;
     
@@ -382,26 +509,69 @@ const char* hackPrankPage = R"rawliteral(
       if (seconds > 0) {
         seconds--;
         countdown.textContent = seconds;
+        
+        if (seconds <= 3) {
+          countdown.style.fontSize = "50px";
+        }
+        
         setTimeout(updateCountdown, 1000);
       } else {
-        countdown.textContent = "Hacking COMPLETE!";
-        startFlicker();
+        countdown.textContent = "DEVICE COMPROMISED";
+        countdown.style.fontSize = "36px";
+        startFinalEffects();
       }
     }
     
     // Start countdown
     setTimeout(updateCountdown, 1000);
     
-    // Final flicker effect
-    function startFlicker() {
-      document.body.classList.add('flicker');
+    // Create image leak thumbnails
+    function createThumbnails() {
+      const thumbnailContainer = document.getElementById('thumbnails');
+      for (let i = 0; i < 12; i++) {
+        const thumb = document.createElement('div');
+        thumb.className = 'thumbnail';
+        thumb.style.backgroundColor = `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, 0.5)`;
+        thumbnailContainer.appendChild(thumb);
+      }
+    }
+    createThumbnails();
+    
+    // Show GPS data in popup
+    function showGpsData() {
+      const gpsElement = document.getElementById('gps-coords');
+      // Generate random coordinates
+      const lat = (Math.random() * 180 - 90).toFixed(6);
+      const lng = (Math.random() * 360 - 180).toFixed(6);
+      gpsElement.textContent = `LAT: ${lat} LNG: ${lng}`;
+    }
+    
+    // Random screen glitches
+    function randomGlitch() {
+      if (Math.random() > 0.7) {
+        document.body.classList.add('flicker');
+        setTimeout(() => {
+          document.body.classList.remove('flicker');
+        }, 100 + Math.random() * 300);
+      }
       
-      // Random screen shakes
-      setInterval(() => {
-        const xPos = Math.random() * 10 - 5;
-        const yPos = Math.random() * 10 - 5;
-        document.body.style.transform = `translate(${xPos}px, ${yPos}px)`;
-      }, 100);
+      if (Math.random() > 0.9) {
+        const mainContainer = document.getElementById('main-container');
+        mainContainer.style.filter = `hue-rotate(${Math.random() * 360}deg)`;
+        setTimeout(() => {
+          mainContainer.style.filter = 'none';
+        }, 50 + Math.random() * 100);
+      }
+      
+      setTimeout(randomGlitch, 500 + Math.random() * 2000);
+    }
+    setTimeout(randomGlitch, 2000);
+    
+    // Final effects
+    function startFinalEffects() {
+      // Add severe screen shake
+      document.body.classList.add('shake');
+      document.body.classList.add('flicker');
       
       // Try to go fullscreen
       try {
@@ -419,8 +589,34 @@ const char* hackPrankPage = R"rawliteral(
       
       // Try to vibrate device
       if ('vibrate' in navigator) {
-        navigator.vibrate([500, 100, 500, 100, 500]);
+        // Intense vibration pattern
+        navigator.vibrate([300, 100, 300, 100, 600, 100, 300, 100, 300]);
       }
+      
+      // Flash warning popup
+      const warningPopup = document.getElementById('warning-popup');
+      warningPopup.style.display = 'block';
+      showGpsData();
+      
+      // Flash image leak
+      setTimeout(() => {
+        const imageLeakElement = document.getElementById('image-leak');
+        imageLeakElement.style.display = 'block';
+        setTimeout(() => {
+          imageLeakElement.style.display = 'none';
+        }, 800);
+      }, 1500);
+      
+      // Random popup flashes
+      let flashCount = 0;
+      function flashWarning() {
+        if (flashCount < 5) {
+          warningPopup.style.display = warningPopup.style.display === 'block' ? 'none' : 'block';
+          flashCount++;
+          setTimeout(flashWarning, 300 + Math.random() * 500);
+        }
+      }
+      setTimeout(flashWarning, 3000);
     }
     
     // Prevent back button
