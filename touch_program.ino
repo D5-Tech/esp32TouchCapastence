@@ -10,7 +10,7 @@ void loop() {
   int touchValue = touchRead(TOUCH_PIN);  // Read touch input
   Serial.println(touchValue);  // Print value for debugging
 
-  if (touchValue < 30) {  // Adjust this threshold if needed
+  if (touchValue < 60) {  // Adjust this threshold if needed
     digitalWrite(LED_PIN, HIGH); // Turn LED ON
   } else {
     digitalWrite(LED_PIN, LOW);  // Turn LED OFF
