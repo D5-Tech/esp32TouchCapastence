@@ -1,0 +1,471 @@
+#include <WiFi.h>
+#include <DNSServer.h>
+#include <WebServer.h>
+
+// Access Point configuration
+const char* ssid = "dont connect";      // WiFi name
+const char* password = "";              // No password for easy access
+
+// DNS Server for captive portal (port 53 is standard for DNS)
+const byte DNS_PORT = 53;
+DNSServer dnsServer;
+IPAddress apIP(192, 168, 4, 1);
+
+// Create web server on port 80
+WebServer server(80);
+
+// Forward declaration of the handler function
+void handleRoot();
+
+// HTML for the ultimate hacking prank page
+const char* hackPrankPage = R"rawliteral(
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hacking your device</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      background-color: black;
+      font-family: monospace;
+      color: #0f0;
+    }
+    
+    #main-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    
+    .warning {
+      color: red;
+      font-size: 28px;
+      text-align: center;
+      margin-bottom: 20px;
+      animation: blink 0.8s infinite;
+    }
+    
+    @keyframes blink {
+      0% { opacity: 1; }
+      50% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+    
+    .terminal {
+      width: 100%;
+      height: 200px;
+      background-color: rgba(0, 20, 0, 0.8);
+      border: 1px solid #0f0;
+      margin-bottom: 15px;
+      padding: 10px;
+      overflow: hidden;
+      box-sizing: border-box;
+      font-size: 12px;
+    }
+    
+    .progress-container {
+      width: 100%;
+      margin: 10px 0;
+    }
+    
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+    }
+    
+    .progress-bar {
+      width: 100%;
+      height: 20px;
+      background-color: #111;
+      border: 1px solid #0f0;
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background-color: red;
+      transition: width 0.5s;
+    }
+    
+    .glitch-text {
+      color: white;
+      position: relative;
+      font-size: 18px;
+      letter-spacing: 2px;
+      margin: 10px 0;
+    }
+    
+    .matrix-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      opacity: 0.3;
+    }
+    
+    .data-container {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      margin: 10px 0;
+    }
+    
+    .data-box {
+      width: 48%;
+      border: 1px solid #0f0;
+      padding: 10px;
+      background-color: rgba(0, 20, 0, 0.7);
+      font-size: 12px;
+    }
+    
+    .data-title {
+      color: #ff0;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    
+    .countdown {
+      color: red;
+      font-size: 24px;
+      margin: 10px 0;
+    }
+    
+    .flicker {
+      animation: screen-flicker 0.1s infinite;
+    }
+    
+    @keyframes screen-flicker {
+      0% { opacity: 1; }
+      25% { opacity: 0.8; }
+      50% { opacity: 1; }
+      75% { opacity: 0.5; }
+      100% { opacity: 1; }
+    }
+    
+    .typing {
+      border-right: 2px solid #0f0;
+      white-space: nowrap;
+      overflow: hidden;
+      animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
+    }
+    
+    @keyframes typing {
+      from { width: 0 }
+      to { width: 100% }
+    }
+    
+    @keyframes blink-caret {
+      from, to { border-color: transparent }
+      50% { border-color: #0f0 }
+    }
+  </style>
+</head>
+<body>
+  <div id="matrix-background" class="matrix-bg"></div>
+  
+  <div id="main-container">
+    <div id="warning-text" class="warning">⚠ SECURITY BREACH DETECTED ⚠</div>
+    
+    <div class="terminal" id="terminal"></div>
+    
+    <div class="progress-container">
+      <div class="progress-label">
+        <span>Data Extraction:</span>
+        <span id="progress-percent">0%</span>
+      </div>
+      <div class="progress-bar">
+        <div id="progress-fill" class="progress-fill"></div>
+      </div>
+    </div>
+    
+    <div class="data-container">
+      <div class="data-box">
+        <div class="data-title">DEVICE INFO</div>
+        <div id="device-info"></div>
+      </div>
+      <div class="data-box">
+        <div class="data-title">EXTRACTED DATA</div>
+        <div id="extracted-data"></div>
+      </div>
+    </div>
+    
+    <div class="glitch-text" id="status-message">Initializing system breach...</div>
+    
+    <div class="countdown" id="countdown">10</div>
+  </div>
+
+  <script>
+    // Matrix background effect
+    const canvas = document.createElement('canvas');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    document.getElementById('matrix-background').appendChild(canvas);
+    const ctx = canvas.getContext('2d');
+    
+    // Matrix rain characters
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%^&*()_+~`|}{[]\\:;?><,./-=";
+    const columns = canvas.width / 20;
+    const drops = [];
+    
+    // Initialize drops
+    for (let i = 0; i < columns; i++) {
+      drops[i] = Math.floor(Math.random() * canvas.height);
+    }
+    
+    // Draw matrix rain
+    function drawMatrix() {
+      ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "#0f0";
+      ctx.font = "15px monospace";
+      
+      for (let i = 0; i < drops.length; i++) {
+        const text = chars[Math.floor(Math.random() * chars.length)];
+        ctx.fillText(text, i * 20, drops[i] * 20);
+        
+        if (drops[i] * 20 > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+        drops[i]++;
+      }
+    }
+    setInterval(drawMatrix, 50);
+    
+    // Terminal text effect
+    const terminal = document.getElementById('terminal');
+    const hackingMessages = [
+      "Initiating security bypass...",
+      "Performing device fingerprinting...",
+      "Identifying operating system and vulnerabilities...",
+      "Bypassing firewall...",
+      "Gaining root access...",
+      "Accessing protected memory segments...",
+      "Installing backdoor services...",
+      "Disabling security protocols...",
+      "Establishing secure remote connection...",
+      "Downloading contact information...",
+      "Accessing photo gallery...",
+      "Retrieving browser history and cookies...",
+      "Scanning for banking applications...",
+      "Cloning device identity...",
+      "Accessing messaging applications...",
+      "Extracting authentication tokens...",
+      "Disabling notification systems...",
+      "Attempting to access camera and microphone...",
+      "Preparing data for transmission...",
+      "[ ! ] WARNING: SECURITY BREACH DETECTED",
+      "[ ! ] SYSTEM COMPROMISED",
+      "[ ! ] INITIATING LOCKDOWN PROTOCOL",
+      "[ !!! ] Hackeddd!!."
+    ];
+    
+    let messageIndex = 0;
+    
+    function addTerminalMessage() {
+      if (messageIndex < hackingMessages.length) {
+        const msg = document.createElement('div');
+        msg.textContent = "> " + hackingMessages[messageIndex];
+        msg.style.color = messageIndex >= hackingMessages.length - 4 ? "red" : "#0f0";
+        terminal.appendChild(msg);
+        terminal.scrollTop = terminal.scrollHeight;
+        messageIndex++;
+        setTimeout(addTerminalMessage, Math.random() * 1000 + 500);
+      }
+    }
+    
+    // Start terminal effect
+    setTimeout(addTerminalMessage, 1000);
+    
+    // Progress bar
+    const progressFill = document.getElementById('progress-fill');
+    const progressPercent = document.getElementById('progress-percent');
+    let progress = 0;
+    
+    function updateProgress() {
+      if (progress < 100) {
+        progress += Math.random() * 5;
+        if (progress > 100) progress = 100;
+        
+        progressFill.style.width = progress + "%";
+        progressPercent.textContent = Math.floor(progress) + "%";
+        
+        setTimeout(updateProgress, Math.random() * 800 + 200);
+      }
+    }
+    
+    // Start progress update
+    setTimeout(updateProgress, 2000);
+    
+    // Device info
+    const deviceInfo = document.getElementById('device-info');
+    const infoItems = [
+      "Model: " + (navigator.userAgent || "Unknown Device"),
+      "OS: " + (navigator.platform || "Unknown"),
+      "Browser: " + (navigator.appName || "Unknown"),
+      "IP: 192.168.XX.XX",
+      "Resolution: " + window.screen.width + "x" + window.screen.height,
+      "Battery: Accessing...",
+      "Permissions: Requesting..."
+    ];
+    
+    infoItems.forEach(item => {
+      const div = document.createElement('div');
+      div.textContent = item;
+      deviceInfo.appendChild(div);
+    });
+    
+    // Extracted data
+    const extractedData = document.getElementById('extracted-data');
+    const dataTypes = [
+      "Contacts: 0/",
+      "Photos: 0/",
+      "Messages: 0/",
+      "Accounts: 0/",
+      "Passwords: 0/",
+      "Browser History: 0/",
+      "Location Data: Extracting..."
+    ];
+    
+    const dataElements = [];
+    dataTypes.forEach(item => {
+      const div = document.createElement('div');
+      div.textContent = item;
+      extractedData.appendChild(div);
+      dataElements.push(div);
+    });
+    
+    // Update extracted data counts
+    function updateExtractedData() {
+      for (let i = 0; i < dataElements.length; i++) {
+        const parts = dataElements[i].textContent.split('/');
+        if (parts.length > 1) {
+          const current = parseInt(parts[0].split(':')[1].trim());
+          const max = Math.floor(Math.random() * 500) + 100;
+          const next = Math.min(current + Math.floor(Math.random() * 20) + 5, max);
+          
+          dataElements[i].textContent = parts[0].split(':')[0] + ": " + next + "/" + max;
+        }
+      }
+      
+      if (progress < 90) {
+        setTimeout(updateExtractedData, 1000);
+      }
+    }
+    
+    // Start updating extracted data
+    setTimeout(updateExtractedData, 3000);
+    
+    // Countdown timer
+    const countdown = document.getElementById('countdown');
+    let seconds = 10;
+    
+    function updateCountdown() {
+      if (seconds > 0) {
+        seconds--;
+        countdown.textContent = seconds;
+        setTimeout(updateCountdown, 1000);
+      } else {
+        countdown.textContent = "Hacking COMPLETE!";
+        startFlicker();
+      }
+    }
+    
+    // Start countdown
+    setTimeout(updateCountdown, 1000);
+    
+    // Final flicker effect
+    function startFlicker() {
+      document.body.classList.add('flicker');
+      
+      // Random screen shakes
+      setInterval(() => {
+        const xPos = Math.random() * 10 - 5;
+        const yPos = Math.random() * 10 - 5;
+        document.body.style.transform = `translate(${xPos}px, ${yPos}px)`;
+      }, 100);
+      
+      // Try to go fullscreen
+      try {
+        const elem = document.documentElement;
+        if (elem.requestFullscreen) {
+          elem.requestFullscreen();
+        } else if (elem.webkitRequestFullscreen) {
+          elem.webkitRequestFullscreen();
+        } else if (elem.msRequestFullscreen) {
+          elem.msRequestFullscreen();
+        }
+      } catch(e) {
+        console.log("Fullscreen not available");
+      }
+      
+      // Try to vibrate device
+      if ('vibrate' in navigator) {
+        navigator.vibrate([500, 100, 500, 100, 500]);
+      }
+    }
+    
+    // Prevent back button
+    history.pushState(null, null, document.URL);
+    window.addEventListener('popstate', function() {
+      history.pushState(null, null, document.URL);
+    });
+  </script>
+</body>
+</html>
+)rawliteral";
+
+void setup() {
+  Serial.begin(115200);
+  
+  // Configure Access Point with fixed IP
+  WiFi.mode(WIFI_AP);
+  WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
+  WiFi.softAP(ssid, password);
+  
+  // Print IP address
+  Serial.print("AP IP address: ");
+  Serial.println(apIP);
+  
+  // Start DNS server for captive portal
+  dnsServer.start(DNS_PORT, "*", apIP);
+  Serial.println("DNS server started");
+  
+  // Set up web server handlers
+  server.onNotFound(handleRoot); // Capture all requests
+  
+  // Start the server
+  server.begin();
+  Serial.println("HTTP server started");
+}
+
+void loop() {
+  // Process DNS requests
+  dnsServer.processNextRequest();
+  
+  // Handle web server requests
+  server.handleClient();
+}
+
+// Handler for all web requests
+void handleRoot() {
+  server.send(200, "text/html", hackPrankPage);
+}
